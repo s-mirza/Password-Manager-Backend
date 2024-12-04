@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* Name: Sarah Mirza
+ * ID: W10178836
+ * Description: Developing the backend functionality for a basic password manager application.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -31,6 +36,8 @@ namespace CSC317PassManagerP2Starter.Modules.Controllers
             {
                 source.Add(new PasswordRow(password));  // Pass PasswordModel directly to PasswordRow constructor
             }
+
+            Console.WriteLine($"Populated Password Rows: {source.Count}"); // Debug output
         }
 
 
@@ -88,6 +95,7 @@ namespace CSC317PassManagerP2Starter.Modules.Controllers
         // Generates a set of random passwords for the test user.
         public void GenTestPasswords()
         {
+            Console.WriteLine("GenTestPasswords called.");
             _passwords.Clear();
             counter = 1; // Reset the counter.
 
@@ -97,12 +105,23 @@ namespace CSC317PassManagerP2Starter.Modules.Controllers
             var random = new Random();
             for (int i = 0; i < 5; i++)
             {
-                AddPassword(
-                    testPlatforms[random.Next(testPlatforms.Length)],
-                    testUsernames[random.Next(testUsernames.Length)],
-                    Guid.NewGuid().ToString("N").Substring(0, 12) // Random password.
-                );
+                string platform = testPlatforms[random.Next(testPlatforms.Length)];
+                string username = testUsernames[random.Next(testUsernames.Length)];
+                string password = GenerateRandomPassword();
+
+                AddPassword(platform, username, password);
+                Console.WriteLine($"Added Password: {platform}, {username}, {password}"); // Debug output
             }
         }
+
+        private string GenerateRandomPassword(int length = 12)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+
+
     }
 }

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/* Name: Sarah Mirza
+ * ID: W10178836
+ * Description: Developing the backend functionality for a basic password manager application.
+ */
+
+using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CSC317PassManagerP2Starter.Modules.Models;
 
-
-
-/* This module contains the class definition for Password Row.
- * 
- * The methods are missing their bodies.  Fill in the method definitions below.
- * 
- */
 namespace CSC317PassManagerP2Starter.Modules.Views
 {
     public class PasswordRow : BindableObject, INotifyPropertyChanged
@@ -23,107 +17,112 @@ namespace CSC317PassManagerP2Starter.Modules.Views
 
         public PasswordRow(PasswordModel source)
         {
-            _pass = source;
+            _pass = source ?? throw new ArgumentNullException(nameof(source));
         }
 
-        //Create your Binding Properties here, which should reflect the front-end bindings.
-        //See the example of "Platform" below.
+        // Platform binding property
         public string Platform
         {
             get
             {
-                //complete getter for Platform.  currenly returns an empty string. 
-                return "";
+                // Return the platform name from the PasswordModel
+                return _pass?.Platform ?? string.Empty;
             }
             set
             {
-                //complete setter for Platform.
-
-                //This needs to be called for updating the binding when
-                //the platform name is edited.  Leave here.
-                RefreshRow();
+                // Update the platform in the PasswordModel and refresh the row
+                if (_pass.Platform != value)
+                {
+                    _pass.Platform = value;
+                    RefreshRow();
+                }
             }
         }
 
+        // Username binding property
         public string PlatformUserName
         {
             get
             {
-                //Complete getter for User Name.
-                return "";
+                // Return the username from the PasswordModel
+                return _pass?.UserName ?? string.Empty;
             }
             set
             {
-                //complete setter for User Name.
-                RefreshRow();
+                // Update the username in the PasswordModel and refresh the row
+                if (_pass.UserName != value)
+                {
+                    _pass.UserName = value;
+                    RefreshRow();
+                }
             }
         }
 
+        // Password binding property
         public string PlatformPassword
         {
             get
             {
-               //complete getter for Password.  Currenly returns "hidden."
-               //This should return the actual password is the Show toggle
-               //is true.
-               //note that the password should be decrypted using the user's
-               //encryption key before being shown.
-               return "<hidden>";
+                // Show the password if IsShown is true; otherwise, return "<hidden>"
+                return IsShown ? _pass?.Password ?? string.Empty : "<hidden>";
             }
             set
             {
-                //complete setter for password.  Note that this ONLY changes the password
-                //stored in the row.  The password should not be committed to the model
-                //data until save is clicked.
-
-
-                RefreshRow();
+                // Update the password temporarily in the row
+                if (_pass.Password != value)
+                {
+                    _pass.Password = value;
+                    RefreshRow();
+                }
             }
         }
 
+
+        // Password ID binding property
         public int PasswordID
         {
             get
             {
-                //complete getter for the pass ID.  Is binded to the edit/save/copy/delete buttons.
-                //currently returns -1;
-                return -1;
+                // Return the password ID from the PasswordModel
+                return _pass?.ID ?? -1;
             }
         }
 
+        // Show Password toggle binding property
         public bool IsShown
         {
-            get
-            {
-                //complete getter for IsShown, which is binded to the Show Password
-                //toggle/switch.
-                return false;
-            }
+            get => _isVisible;
             set
             {
-                //complete setter for IsShown.
-                RefreshRow();
+                if (_isVisible != value)
+                {
+                    _isVisible = value;
+                    RefreshRow();
+                }
             }
         }
 
+
+        // Editing mode toggle binding property
         public bool Editing
         {
             get
             {
-                //Complete getter for Editing, which is toggled when the "edit/save" button
-                //is clicked.  
-                return false;
+                // Return the editing mode status
+                return _editing;
             }
             set
             {
-                //Complete setter for Editing.
-                RefreshRow();
+                // Set the editing mode status and refresh the row
+                if (_editing != value)
+                {
+                    _editing = value;
+                    RefreshRow();
+                }
             }
         }
 
-
-        //This is called when a bound property is changed on the front-end.  Causes the 
-        //front-end to update the collection view.
+        // Called when a bound property changes, notifying the view to update
         private void RefreshRow()
         {
             OnPropertyChanged(nameof(Platform));
@@ -133,11 +132,31 @@ namespace CSC317PassManagerP2Starter.Modules.Views
             OnPropertyChanged(nameof(Editing));
         }
 
+        // Decrypts the password (implement actual decryption logic here)
+        private string DecryptPassword(string encryptedPassword)
+        {
+            // For simplicity, we'll just return the password as-is.
+            // Replace this with actual decryption logic if needed.
+            return encryptedPassword;
+        }
+
+        // Saves the changes to the password model data
         public void SavePassword()
         {
-            //Is called when the "save" button is clicked.  Saves the changes to the
-            //password to the model data.
+            if (Editing)
+            {
+                // Commit the changes to the model
+                _editing = false;
+                RefreshRow();
+            }
+        }
+
+        // Event handler for property changes (for INotifyPropertyChanged)
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }

@@ -1,3 +1,8 @@
+/* Name: Sarah Mirza
+ * ID: W10178836
+ * Description: Developing the backend functionality for a basic password manager application.
+ */
+
 namespace CSC317PassManagerP2Starter.Modules.Views;
 using CSC317PassManagerP2Starter.Modules.Controllers;
 using CSC317PassManagerP2Starter.Modules.Models;
@@ -19,6 +24,7 @@ public partial class AddPasswordView : ContentPage
         generatedPassword = false;
     }
 
+
     private void ButtonCancel(object sender, EventArgs e)
     {
         // Navigate back to the previous page or the main password list view
@@ -27,51 +33,48 @@ public partial class AddPasswordView : ContentPage
 
     private void ButtonSubmitExisting(object sender, EventArgs e)
     {
-        // Validate the existing password fields
-        string platform = txtNewPlatform.Text;
-        string username = txtNewUserName.Text;
-        string password = txtNewPassword.Text;
-        string passwordVerify = txtNewPasswordVerify.Text;
-
-        if (string.IsNullOrWhiteSpace(platform) || string.IsNullOrWhiteSpace(username) ||
-            string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(passwordVerify))
+        //Called when the Submit button is clicked for a password manually
+        //entered.  (i.e., existing password).
+        if (string.IsNullOrWhiteSpace(txtNewPlatform.Text) ||
+             string.IsNullOrWhiteSpace(txtNewUserName.Text) ||
+             string.IsNullOrWhiteSpace(txtNewPassword.Text) ||
+             txtNewPassword.Text != txtNewPasswordVerify.Text)
         {
-            ShowErrorMessage(lblErrorExistingPassword, "All fields must be filled out.");
+
+            lblErrorExistingPassword.Text = "Invalid input or passwords do not match!";
+            lblErrorExistingPassword.IsVisible = true;
             return;
         }
 
-        if (password != passwordVerify)
-        {
-            ShowErrorMessage(lblErrorExistingPassword, "Passwords do not match.");
-            return;
-        }
 
-        // Add the password using the PasswordController
-        App.PasswordController.AddPassword(platform, username, password);
-        App.Current.MainPage = new PasswordListView();
+        App.PasswordController.AddPassword(
+            txtNewPlatform.Text,
+            txtNewUserName.Text,
+            txtNewPassword.Text
+        );
+
+        Application.Current.MainPage = new PasswordListView();
     }
 
     private void ButtonSubmitGenerated(object sender, EventArgs e)
     {
-        if (!generatedPassword)
+
+        if (!generatedPassword || string.IsNullOrWhiteSpace(lblGenPassword.Text) || lblGenPassword.Text == "<No Password Generated>")
         {
-            ShowErrorMessage(lblErrorGeneratedPassword, "You must generate a password before submitting.");
+            lblErrorGeneratedPassword.Text = "Please generate a password first.";
+            lblErrorGeneratedPassword.IsVisible = true;
             return;
         }
 
-        string platform = txtNewPlatform.Text;
-        string username = txtNewUserName.Text;
-        string password = lblGenPassword.Text;
 
-        if (string.IsNullOrWhiteSpace(platform) || string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-        {
-            ShowErrorMessage(lblErrorGeneratedPassword, "All fields must be filled out.");
-            return;
-        }
+        App.PasswordController.AddPassword(
+            txtNewPlatform.Text,
+            txtNewUserName.Text,
+            lblGenPassword.Text
+        );
 
-        // Add the password using the PasswordController
-        App.PasswordController.AddPassword(platform, username, password);
-        App.Current.MainPage = new PasswordListView();
+
+        Application.Current.MainPage = new PasswordListView();
     }
 
     private void ButtonGeneratePassword(object sender, EventArgs e)

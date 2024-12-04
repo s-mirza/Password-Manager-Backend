@@ -1,3 +1,9 @@
+/* Name: Sarah Mirza
+ * ID: W10178836
+ * Description: Developing the backend functionality for a basic password manager application.
+ */
+
+
 using System.Collections.ObjectModel;
 using CSC317PassManagerP2Starter.Modules.Models;
 
@@ -11,6 +17,8 @@ public partial class PasswordListView : ContentPage
     {
         InitializeComponent();
 
+        Console.WriteLine("PasswordListView Constructor Called");
+
         // Generate test passwords when the view loads.
         App.PasswordController.GenTestPasswords();
 
@@ -19,6 +27,8 @@ public partial class PasswordListView : ContentPage
 
         // Bind the Collection View to the password rows.
         collPasswords.ItemsSource = _rows;
+
+        Console.WriteLine($"Total Password Rows: {_rows.Count}");
     }
 
     private void TextSearchBar(object sender, TextChangedEventArgs e)
@@ -48,30 +58,36 @@ public partial class PasswordListView : ContentPage
         }
     }
 
+
     private void EditPassword(object sender, EventArgs e)
     {
-        // Get the ID of the selected password.
-        int ID = Convert.ToInt32((sender as Button).CommandParameter);
+        // Get the button that generated the event
+        var btnSender = sender as Button;
+        if (btnSender == null) return;
 
-        // Find the row corresponding to the ID.
+        // Retrieve the ID of the password row
+        int ID = Convert.ToInt32(btnSender.CommandParameter);
+
+        // Get the password row by ID
         var passwordRow = _rows.FirstOrDefault(row => row.PasswordID == ID);
-
-        if (passwordRow != null)
+        if (passwordRow == null)
         {
-            // Toggle the editing mode.
-            passwordRow.Editing = !passwordRow.Editing;
+            DisplayAlert("Error", "Password not found.", "OK");
+            return;
+        }
 
-            if (!passwordRow.Editing)
-            {
-                // Save the updated password details when exiting editing mode.
-                App.PasswordController.UpdatePassword(new PasswordModel
-                {
-                    ID = passwordRow.PasswordID,
-                    Platform = passwordRow.Platform,
-                    UserName = passwordRow.PlatformUserName,
-                    Password = passwordRow.PlatformPassword
-                });
-            }
+        // Toggle between Edit and Save modes
+        if (passwordRow.Editing)
+        {
+            // Save changes and switch to ReadOnly mode
+            passwordRow.SavePassword();
+            btnSender.Text = "Edit"; // Update button text
+        }
+        else
+        {
+            // Switch to Edit mode
+            passwordRow.Editing = true; // Enable edit mode
+            btnSender.Text = "Save"; // Update button text
         }
     }
 

@@ -1,3 +1,8 @@
+/* Name: Sarah Mirza
+ * ID: W10178836
+ * Description: Developing the backend functionality for a basic password manager application.
+ */
+
 namespace CSC317PassManagerP2Starter.Modules.Views;
 using CSC317PassManagerP2Starter.Modules.Controllers; 
 using CSC317PassManagerP2Starter.Modules.Models; 

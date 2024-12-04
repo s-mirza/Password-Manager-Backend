@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* Name: Sarah Mirza
+ * ID: W10178836
+ * Description: Developing the backend functionality for a basic password manager application.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
