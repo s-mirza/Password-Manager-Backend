@@ -12,51 +12,97 @@ namespace CSC317PassManagerP2Starter.Modules.Controllers
 {
     public class PasswordController
     {
-        //Stores a list of sample passwords for the test user.
+        // Stores a list of sample passwords for the test user.
         public List<PasswordModel> _passwords = new List<PasswordModel>();
         private int counter = 1;
 
-
-        /*
-         * The following functions need to be completed.
-         */
-        //Used to copy the passwords over to the Row Binders.
+        // Copies the passwords over to the Row Binders.
         public void PopulatePasswordView(ObservableCollection<PasswordRow> source, string search_criteria = "")
         {
-            //Complete definition of PopulatePasswordView here.
+            source.Clear(); // Clear the existing rows.
+
+            var filteredPasswords = string.IsNullOrWhiteSpace(search_criteria)
+                ? _passwords
+                : _passwords.Where(p =>
+                      p.Platform.Contains(search_criteria, StringComparison.OrdinalIgnoreCase) ||
+                      p.UserName.Contains(search_criteria, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var password in filteredPasswords)
+            {
+                source.Add(new PasswordRow(password));  // Pass PasswordModel directly to PasswordRow constructor
+            }
         }
 
-        //CRUD operations for the password list.
+
+
+        // Adds a new password to the list.
         public void AddPassword(string platform, string username, string password)
         {
-            //Complete definition of AddPassword here.
+            var newPassword = new PasswordModel
+            {
+                ID = counter++, // Auto-increment ID.
+                Platform = platform,
+                UserName = username,
+                Password = password
+            };
+
+            _passwords.Add(newPassword);
         }
 
+        // Retrieves a password by ID.
         public PasswordModel? GetPassword(int ID)
         {
-           //Complete definition of GetPassword here.
-
-            return null;
+            return _passwords.FirstOrDefault(p => p.ID == ID);
         }
 
+        // Updates an existing password entry.
         public bool UpdatePassword(PasswordModel changes)
         {
-           //Complete definition of Update Password here.
+            var password = GetPassword(changes.ID);
+
+            if (password != null)
+            {
+                password.Platform = changes.Platform;
+                password.UserName = changes.UserName;
+                password.Password = changes.Password;
+                return true;
+            }
 
             return false;
         }
 
+        // Removes a password by ID.
         public bool RemovePassword(int ID)
         {
-           //Complete definition of Remove Password here.
+            var password = GetPassword(ID);
+
+            if (password != null)
+            {
+                _passwords.Remove(password);
+                return true;
+            }
 
             return false;
         }
 
+        // Generates a set of random passwords for the test user.
         public void GenTestPasswords()
         {
-            //Generate a set of random passwords for the test user.
-            //Called in Password List Page.
+            _passwords.Clear();
+            counter = 1; // Reset the counter.
+
+            var testPlatforms = new[] { "Google", "Facebook", "Twitter", "LinkedIn", "Instagram" };
+            var testUsernames = new[] { "user1", "user2", "admin", "test", "example" };
+
+            var random = new Random();
+            for (int i = 0; i < 5; i++)
+            {
+                AddPassword(
+                    testPlatforms[random.Next(testPlatforms.Length)],
+                    testUsernames[random.Next(testUsernames.Length)],
+                    Guid.NewGuid().ToString("N").Substring(0, 12) // Random password.
+                );
+            }
         }
     }
 }
