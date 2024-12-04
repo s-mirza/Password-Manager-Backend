@@ -8,19 +8,33 @@ using CSC317PassManagerP2Starter.Modules.Controllers;
 using CSC317PassManagerP2Starter.Modules.Models;
 using Microsoft.Maui.Controls;
 
+
+
 public partial class AddPasswordView : ContentPage
 {
     private Color baseColorHighlight;
     private bool generatedPassword;
 
-    public AddPasswordView()
+    public AddPasswordView(PasswordModel password = null)
     {
         InitializeComponent();
 
         // Stores the original color of the text boxes
         baseColorHighlight = (Color)Application.Current.Resources["ErrorEntryHighlightBG"];
 
-        // Determines if a password was generated at least once
+        // If a password is provided, pre-fill the fields with its data
+        if (password != null)
+        {
+            // Use the 'password' parameter correctly
+            txtNewPlatform.Text = password.Platform; // Ensure 'Platform' is a property of 'PasswordModel'
+            txtNewUserName.Text = password.UserName; // Ensure 'UserName' is a property of 'PasswordModel'
+
+            // Create a PasswordRow instance and decrypt the password
+            var passwordRow = new PasswordRow(password);  // Create an instance of PasswordRow
+            txtNewPassword.Text = passwordRow.DecryptPassword(password.Password); // Decrypt using PasswordRow
+            txtNewPasswordVerify.Text = txtNewPassword.Text;
+        }
+
         generatedPassword = false;
     }
 
@@ -77,21 +91,21 @@ public partial class AddPasswordView : ContentPage
         Application.Current.MainPage = new PasswordListView();
     }
 
+ 
     private void ButtonGeneratePassword(object sender, EventArgs e)
     {
-        // Generate a secure password based on selected criteria
-        bool requireUpper = chkUpperLetter.IsChecked;
-        bool requireDigit = chkDigit.IsChecked;
-        bool requireSymbols = chkSymbols.IsChecked;
-        string validSymbols = txtReqSymbols.Text ?? string.Empty;
+        //Called when the Generate Password button is clicked.
+        string newPassword = PasswordGeneration.BuildPassword(
+            chkUpperLetter.IsChecked,
+            chkDigit.IsChecked,
+            txtReqSymbols.Text,
+            (int)sprPassLength.Value
+         );
 
-        int minLength = (int)sprPassLength.Value;
-
-        string generatedPassword = GenerateSecurePassword(requireUpper, requireDigit, requireSymbols, validSymbols, minLength);
-
-        lblGenPassword.Text = generatedPassword;
-        lblGenPassword.TextColor = Colors.Green;
-        this.generatedPassword = true;
+        // Display the generated password
+        lblGenPassword.Text = newPassword;
+        generatedPassword = true;
+        lblErrorGeneratedPassword.IsVisible = false;
     }
 
     private string GenerateSecurePassword(bool requireUpper, bool requireDigit, bool requireSymbols, string validSymbols, int minLength)

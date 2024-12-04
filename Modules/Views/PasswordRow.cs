@@ -1,7 +1,4 @@
-﻿/* Name: Sarah Mirza
- * ID: W10178836
- * Description: Developing the backend functionality for a basic password manager application.
- */
+﻿
 
 using System;
 using System.ComponentModel;
@@ -133,7 +130,7 @@ namespace CSC317PassManagerP2Starter.Modules.Views
         }
 
         // Decrypts the password (implement actual decryption logic here)
-        private string DecryptPassword(string encryptedPassword)
+        public string DecryptPassword(string encryptedPassword)
         {
             // For simplicity, we'll just return the password as-is.
             // Replace this with actual decryption logic if needed.
